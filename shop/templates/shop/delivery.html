@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}Доставка{% endblock %}
+
+{% block content %}
+
+<section class="delivery-page">
+  <div class="delivery-page__inner">
+
+    <div class="delivery-hero">
+      <h1 class="delivery-page__title">Доставка</h1>
+      <p class="delivery-page__lead">
+        Ми прагнемо зробити отримання ритуальних товарів максимально зручним,
+        швидким і зрозумілим для кожного клієнта.
+      </p>
+    </div>
+
+    <div class="delivery-grid">
+      <article class="delivery-block">
+        <h2 class="delivery-block__title">Що доступно до замовлення</h2>
+        <p class="delivery-block__text">
+          У нашому асортименті представлені товари таких категорій:
+          труни, хрести, вінки, надгробні огорожі, тканинні вироби
+          та інша ритуальна атрибутика.
+        </p>
+      </article>
+
+      <article class="delivery-block">
+        <h2 class="delivery-block__title">Способи отримання</h2>
+        <ul class="delivery-list">
+          <li>Самовивіз</li>
+          <li>Доставка за домовленістю</li>
+          <li>Уточнення деталей менеджером після оформлення</li>
+        </ul>
+      </article>
+    </div>
+
+    <div class="delivery-wide">
+      <h2 class="delivery-block__title">Регіони доставки</h2>
+      <p class="delivery-wide__text">
+        Отримання товарів можливе самовивозом або з доставкою в такі області:
+        Дніпропетровська, Кіровоградська, Полтавська.
+      </p>
+
+      <div class="delivery-steps">
+        <div class="delivery-step">
+          <div class="delivery-step__num">01</div>
+          <div class="delivery-step__title">Оформлення замовлення</div>
+          <div class="delivery-step__text">
+            Ви залишаєте заявку на сайті або обираєте потрібні товари в каталозі.
+          </div>
+        </div>
+
+        <div class="delivery-step">
+          <div class="delivery-step__num">02</div>
+          <div class="delivery-step__title">Уточнення деталей</div>
+          <div class="delivery-step__text">
+            Менеджер зв’язується з вами для підтвердження замовлення,
+            адреси та способу отримання.
+          </div>
+        </div>
+
+        <div class="delivery-step">
+          <div class="delivery-step__num">03</div>
+          <div class="delivery-step__title">Передача товару</div>
+          <div class="delivery-step__text">
+            Ви отримуєте замовлення зручним способом — самовивозом або доставкою.
+          </div>
+        </div>
+      </div>
+
+      <div class="delivery-note">
+        Якщо у вас є питання щодо наявності товару, термінів або умов доставки,
+        ми завжди готові допомогти та надати консультацію.
+      </div>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}

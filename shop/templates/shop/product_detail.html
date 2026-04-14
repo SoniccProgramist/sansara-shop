@@ -1,0 +1,448 @@
+{% extends 'base.html' %}
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+<style>
+  .product-buy-form {
+    margin-top: 28px;
+    max-width: 620px;
+  }
+
+  .option-block {
+    margin: 22px 0 20px;
+  }
+
+  .option-blocktitle {
+    margin: 0 0 12px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #111;
+  }
+
+  .option-chips {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 8px;
+    max-width: 760px;
+  }
+
+  .option-chip {
+    appearance: none;
+    -webkit-appearance: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 52px;
+    padding: 10px 12px;
+    border: 1px solid rgba(0,0,0,.14);
+    background: #fff;
+    color: #111;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.25;
+    text-align: center;
+    border-radius: 0;
+    box-shadow: none;
+    cursor: pointer;
+    margin: 0;
+    transition: .2s ease;
+    word-break: break-word;
+  }
+
+  .option-chip:hover {
+    background: #f5f5f5;
+    border-color: #111;
+  }
+
+  .option-chip.is-active {
+    background: #111;
+    color: #fff;
+    border-color: #111;
+  }
+
+  .product-infobuy {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 240px;
+    height: 54px;
+    padding: 0 24px;
+    margin-top: 14px;
+    border: none;
+    background: #111;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    border-radius: 0;
+    cursor: pointer;
+    transition: opacity .2s ease;
+  }
+
+  .product-infobuy:hover {
+    opacity: .9;
+  }
+
+  @media (max-width: 1100px) {
+    .option-chips {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 700px) {
+    .option-chips {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .option-chip {
+      min-height: 46px;
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+
+    .product-infobuy {
+      width: 100%;
+      min-width: 0;
+    }
+  }
+</style>
+<section class="product-page">
+  <div class="product-page__inner">
+
+    <div class="product-layout">
+
+      <div class="product-gallery">
+        {% if gallery_images %}
+          <div class="product-gallery__thumbs">
+            {% for img in gallery_images %}
+              <button
+                class="product-thumb {% if forloop.first %}product-thumb--active{% endif %}"
+                type="button"
+                data-full="{{ img.image.url }}"
+                aria-label="Фото {{ forloop.counter }}"
+              >
+                <img src="{{ img.image.url }}" alt="{{ product.name }}">
+              </button>
+            {% endfor %}
+          </div>
+
+          <div class="product-gallery__main">
+            {% with first_img=gallery_images|first %}
+              {% if first_img %}
+                <button class="product-gallery__main-btn" type="button" id="openImageModal">
+                  <img id="mainImage" class="product-gallery__image" src="{{ first_img.image.url }}" alt="{{ product.name }}">
+                </button>
+              {% endif %}
+            {% endwith %}
+          </div>
+        {% else %}
+          <div class="product-gallery__main">
+            <div class="product-gallery__placeholder">Фото</div>
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="product-info">
+        <h1 class="product-info__title">{{ product.name }}</h1>
+
+        {% if product.description %}
+          <div class="product-info__subtitle">
+            {{ product.description|truncatechars:140 }}
+          </div>
+        {% endif %}
+
+        <div class="product-info__price" id="productPrice">
+          {% if selected_variant %}
+            {{ selected_variant.price }} грн
+          {% else %}
+            {{ product.price }} грн
+          {% endif %}
+        </div>
+
+        <div
+          id="productStock"
+          class="product-info__stock product-info__stock--{% if selected_variant %}{{ selected_variant.stock_status }}{% else %}{{ product.stock_status }}{% endif %}">
+          {% if selected_variant %}
+            {{ selected_variant.get_stock_status_display }}
+          {% else %}
+            {{ product.get_stock_status_display }}
+          {% endif %}
+        </div>
+
+        <form method="post" action="{% url 'shop:add_to_cart' product.id %}" class="product-buy-form">
+          {% csrf_token %}
+
+          {% if colors %}
+            <div class="option-block">
+              <div class="option-block__title">Колір</div>
+              <div class="option-chips" id="colorOptions">
+                {% for color in colors %}
+                  <button
+                    type="button"
+                    class="option-chip {% if forloop.first %}is-active{% endif %}"
+                    data-color="{{ color }}"
+                  >
+                    {{ color }}
+                  </button>
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+
+          {% if sizes %}
+            <div class="option-block">
+              <div class="option-block__title">Розмір</div>
+              <div class="option-chips" id="sizeOptions">
+                {% for size in sizes %}
+                  <button
+                    type="button"
+                    class="option-chip {% if forloop.first %}is-active{% endif %}"
+                    data-size="{{ size }}"
+                  >
+                    {{ size }}
+                  </button>
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+
+          {% if not colors and not sizes and variants %}
+            <div class="option-block">
+              <div class="option-block__title">Варіант</div>
+              <div class="option-chips" id="variantFallbackOptions">
+                {% for variant in variants %}
+                  <button
+                    type="button"
+                    class="option-chip {% if forloop.first %}is-active{% endif %}"
+                    data-variant-id="{{ variant.id }}"
+                  >
+                    {{ variant.display_name }}
+                  </button>
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+
+          <input
+            type="hidden"
+            name="variant_id"
+            id="variantIdInput"
+            value="{% if selected_variant %}{{ selected_variant.id }}{% endif %}"
+          >
+
+          <button class="product-info__buy" type="submit">Купити</button>
+        </form>
+      </div>
+
+    </div>
+
+    <div class="product-description-block">
+      <h2 class="product-description-block__title">Опис товару</h2>
+
+      {% if product.description %}
+        <div class="product-description-block__text">
+          {{ product.description|linebreaks }}
+        </div>
+      {% else %}
+        <div class="product-description-block__text">
+          Опис товару буде додано найближчим часом.
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+
+<div class="image-modal" id="imageModal">
+  <div class="image-modal__overlay" id="imageModalOverlay"></div>
+  <div class="image-modal__content">
+    <button class="image-modal__close" id="imageModalClose" type="button">&times;</button>
+    {% if gallery_images %}
+      {% with first_img=gallery_images|first %}
+        {% if first_img %}
+          <img id="modalImage" class="image-modal__img" src="{{ first_img.image.url }}" alt="{{ product.name }}">
+        {% endif %}
+      {% endwith %}
+    {% endif %}
+  </div>
+</div>
+
+{{ variant_data|json_script:"variant-data" }}
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const thumbsContainer = document.querySelector(".product-gallery__thumbs");
+    const mainImage = document.getElementById("mainImage");
+    const modalImage = document.getElementById("modalImage");
+    const priceBlock = document.getElementById("productPrice");
+    const stockBlock = document.getElementById("productStock");
+    const variantIdInput = document.getElementById("variantIdInput");
+
+    const colorButtons = document.querySelectorAll("#colorOptions .option-chip");
+    const sizeButtons = document.querySelectorAll("#sizeOptions .option-chip");
+    const fallbackVariantButtons = document.querySelectorAll("#variantFallbackOptions .option-chip");
+
+    const variantJson = document.getElementById("variant-data");
+    const variantData = variantJson ? JSON.parse(variantJson.textContent) : [];
+
+    let selectedColor = colorButtons.length ? colorButtons[0].dataset.color : "";
+    let selectedSize = sizeButtons.length ? sizeButtons[0].dataset.size : "";
+
+    function bindThumbClicks() {
+      const thumbs = document.querySelectorAll(".product-thumb");
+      thumbs.forEach((thumb) => {
+        thumb.addEventListener("click", function () {
+          const full = this.dataset.full;
+          if (mainImage) mainImage.src = full;
+          if (modalImage) modalImage.src = full;
+
+          thumbs.forEach((t) => t.classList.remove("product-thumb--active"));
+          this.classList.add("product-thumb--active");
+        });
+      });
+    }
+
+    function renderGallery(images) {
+      if (!thumbsContainer || !mainImage || !images || !images.length) return;
+
+      thumbsContainer.innerHTML = "";
+
+      images.forEach((img, index) => {
+        const button = document.createElement("button");
+        button.className = "product-thumb" + (index === 0 ? " product-thumb--active" : "");
+        button.type = "button";
+        button.dataset.full = img.url;
+        button.setAttribute("aria-label", "Фото " + (index + 1));
+
+        const image = document.createElement("img");
+        image.src = img.url;
+        image.alt = "Фото товару";
+
+        button.appendChild(image);
+        thumbsContainer.appendChild(button);
+      });
+
+      mainImage.src = images[0].url;
+      if (modalImage) {
+        modalImage.src = images[0].url;
+      }
+
+      bindThumbClicks();
+    }
+
+    function setActive(buttons, key, value) {
+      buttons.forEach((btn) => {
+        btn.classList.toggle("is-active", btn.dataset[key] === value);
+      });
+    }
+
+    function updateVariantView(variant) {
+      if (!variant) return;
+
+      if (variantIdInput) {
+        variantIdInput.value = variant.id;
+      }
+
+      if (priceBlock) {
+        priceBlock.textContent = variant.price + " грн";
+      }
+
+      if (stockBlock) {
+        stockBlock.textContent = variant.stock_label;
+        stockBlock.className = "product-info__stock product-info__stock--" + variant.stock_status;
+      }
+
+      if (variant.images && variant.images.length) {
+        renderGallery(variant.images);
+      }
+    }
+
+    function findVariant() {
+      let variant = null;
+
+      if (selectedColor && selectedSize) {
+        variant = variantData.find(v => v.color_name === selectedColor && v.size_name === selectedSize);
+      }
+
+      if (!variant && selectedColor) {
+        variant = variantData.find(v => v.color_name === selectedColor);
+      }
+
+      if (!variant && selectedSize) {
+        variant = variantData.find(v => v.size_name === selectedSize);
+      }
+
+      if (!variant && variantData.length) {
+        variant = variantData[0];
+      }
+
+      return variant;
+    }
+
+    bindThumbClicks();
+
+    colorButtons.forEach((btn) => {
+      btn.addEventListener("click", function () {
+        selectedColor = this.dataset.color;
+        setActive(colorButtons, "color", selectedColor);
+        const variant = findVariant();
+
+        if (variant && variant.size_name) {
+          selectedSize = variant.size_name;
+          setActive(sizeButtons, "size", selectedSize);
+        }
+
+        updateVariantView(variant);
+      });
+    });
+
+    sizeButtons.forEach((btn) => {
+      btn.addEventListener("click", function () {
+        selectedSize = this.dataset.size;
+        setActive(sizeButtons, "size", selectedSize);
+        updateVariantView(findVariant());
+      });
+    });
+
+    fallbackVariantButtons.forEach((btn) => {
+      btn.addEventListener("click", function () {
+        fallbackVariantButtons.forEach((b) => b.classList.remove("is-active"));
+        this.classList.add("is-active");
+        const variant = variantData.find(v => String(v.id) === String(this.dataset.variantId));
+        updateVariantView(variant);
+      });
+    });
+
+    if (variantData.length) {
+      updateVariantView(findVariant() || variantData[0]);
+    }
+
+    const modal = document.getElementById("imageModal");
+    const openBtn = document.getElementById("openImageModal");
+    const closeBtn = document.getElementById("imageModalClose");
+    const overlay = document.getElementById("imageModalOverlay");
+
+    if (openBtn && modal) {
+      openBtn.addEventListener("click", function () {
+        modal.classList.add("is-open");
+      });
+    }
+
+    function closeModal() {
+      if (modal) {
+        modal.classList.remove("is-open");
+      }
+    }
+
+    if (closeBtn) closeBtn.addEventListener("click", closeModal);
+    if (overlay) overlay.addEventListener("click", closeModal);
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && modal && modal.classList.contains("is-open")) {
+        closeModal();
+      }
+    });
+  });
+</script>
+{% endblock %}

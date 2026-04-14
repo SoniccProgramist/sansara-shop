@@ -1,0 +1,37 @@
+<footer class="site-footer">
+  <div class="container footer__inner">
+
+    <!-- Каталог -->
+    <div class="footer-col">
+      <div class="footer-title">Каталог</div>
+      <ul class="footer-list">
+        {% for c in header_categories %}
+          <li><a class="footer-link" href="{% url 'shop:category_filter' c.slug %}">{{ c.name }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <!-- Клієнтам -->
+    <div class="footer-col">
+      <div class="footer-title">Клієнтам</div>
+      <ul class="footer-list">
+        <li><a class="footer-link" href="{% url 'shop:about' %}">Про нас</a></li>
+        <li><a class="footer-link" href="{% url 'shop:delivery' %}">Оплата і доставка</a></li>
+      </ul>
+    </div>
+
+    <!-- Контактна інформація -->
+    <div class="footer-col">
+      <div class="footer-title">Контактна інформація</div>
+      <ul class="footer-list">
+        <li><a class="footer-link" href="tel:+380982277727">+38 (098) 227-77-27</a></li>
+        <li><a class="footer-link" href="tel:+380506436466">+38 (050) 046-14-01</a></li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="container footer-bottom">
+    <div class="footer-copy">© 2026 SANSARA</div>
+  </div>
+</footer>

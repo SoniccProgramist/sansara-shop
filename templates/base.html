@@ -1,0 +1,51 @@
+{% load static %}
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}Shop{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  {% include 'partials/header.html' %}
+
+  <main class="page">
+    <div class="container">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+
+  {% include 'footer.html' %}
+
+
+<script>
+  (function(){
+    const wrap = document.getElementById('newdrop');
+    if(!wrap) return;
+
+    const btn = document.getElementById('newdropBtn');
+    const panel = document.getElementById('newdropPanel');
+    const closeBtn = document.getElementById('newdropClose');
+
+    function open(){ wrap.classList.add('newdrop--open'); }
+    function close(){ wrap.classList.remove('newdrop--open'); }
+    function toggle(){ wrap.classList.toggle('newdrop--open'); }
+
+    btn.addEventListener('click', (e) => { e.stopPropagation(); toggle(); });
+    closeBtn.addEventListener('click', (e) => { e.stopPropagation(); close(); });
+
+    document.addEventListener('click', (e) => {
+      if (!wrap.contains(e.target)) close();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') close();
+    });
+  })();
+</script>
+</body>
+</html>

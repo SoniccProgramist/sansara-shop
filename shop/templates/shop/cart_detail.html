@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% block title %}Кошик{% endblock %}
+
+{% block content %}
+
+<section class="cart-page">
+  <div class="cart-page__inner">
+
+    <h1 class="cart-page__title">Кошик</h1>
+
+    {% if cart_items %}
+
+      <div class="cart-list">
+        <div class="cart-list__head">
+          <div>Товар</div>
+          <div class="t-right">Ціна</div>
+          <div class="t-center">К-сть</div>
+          <div class="t-right">Сума</div>
+          <div></div>
+        </div>
+
+        {% for item in cart_items %}
+          <div class="cart-item">
+            <div class="cart-item__product">
+              <div class="cart-item__image">
+                {% if item.image_url %}
+                  <img src="{{ item.image_url }}" alt="{{ item.product.name }}">
+                {% endif %}
+              </div>
+
+              <div class="cart-item__info">
+                <div class="cart-item__name">
+                  {{ item.product.name }}
+                  {% if item.variant_name %}
+                  <div class="cart-item__variant">{{ item.variant_name }}</div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <div class="t-right">{{ item.price }} грн</div>
+
+            <div class="t-center">
+              <form class="qty" method="post" action="{% url 'shop:update_cart' item.product.id %}">
+                {% csrf_token %}
+                {% if item.variant %}
+                <input type="hidden" name="variant_id" value="{{ item.variant.id }}">
+                {% endif %}
+                <input class="qty__input" type="number" name="quantity" value="{{ item.quantity }}" min="1">
+                <button class="qty__btn" type="submit">Ок</button>
+              </form>
+            </div>
+
+            <div class="t-right"><strong>{{ item.item_total }} грн</strong></div>
+
+            <div class="t-right">
+              <a class="cart-remove"
+                 href="{% url 'shop:remove_from_cart' item.product.id %}{% if item.variant %}?variant_id={{ item.variant.id }}{% endif %}">
+                Видалити
+              </a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="cart-summary">
+        <div class="cart-summary__label">Разом</div>
+        <div class="cart-summary__sum">{{ total_price }} грн</div>
+      </div>
+
+      {% if error %}
+        <div class="cart-error">{{ error }}</div>
+      {% endif %}
+
+      <div class="checkout-box">
+        <div class="checkout-box__title">Оформлення замовлення</div>
+
+        <form class="checkout-form" method="post" action="{% url 'shop:cart_detail' %}">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="checkout">
+
+          <div class="checkout-form__grid">
+            <div class="checkout-form__field">
+              <label class="checkout-form__label">Ім’я та прізвище</label>
+              <input class="checkout-form__input" type="text" name="full_name" required>
+            </div>
+
+            <div class="checkout-form__field">
+              <label class="checkout-form__label">Місто</label>
+              <input class="checkout-form__input" type="text" name="city" required>
+            </div>
+
+            <div class="checkout-form__field checkout-form__field--full">
+              <label class="checkout-form__label">Ваш номер телефону</label>
+              <input class="checkout-form__input" type="text" name="phone" placeholder="+380..." required>
+            </div>
+          </div>
+
+          <button class="checkout-form__btn" type="submit">
+            Оформити замовлення
+          </button>
+
+          <div class="checkout-form__note">
+            Після оформлення менеджер зв’яжеться з вами для підтвердження.
+          </div>
+        </form>
+      </div>
+
+    {% else %}
+      <div class="cart-empty">
+        Кошик порожній
+      </div>
+    {% endif %}
+
+  </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,8 @@
+.env
+.venv/
+db.sqlite3
+ngrok.exe
+ngrok.yml
+import_products.csv
+.idea
+media

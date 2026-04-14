@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Замовлення оформлено{% endblock %}
+
+{% block content %}
+<div class="cart-wrap">
+  <div class="cart-card">
+    <h1 class="cart-title">Дякуємо!</h1>
+
+    <div class="cart-success">
+      Ваше замовлення оформлено.<br>
+      Менеджер скоро зв’яжеться з вами для підтвердження.
+    </div>
+
+    <div style="margin-top: 16px;">
+      <a class="btn btn-primary" href="{% url 'shop:product_list' %}">
+        Повернутися до каталогу
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

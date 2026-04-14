@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}SANSARA{% endblock %}
+
+{% block content %}
+
+<section class="hero-advantages">
+  <div class="hero-advantages__banner">
+    <img src="{% static 'img/hero-ritual.jpg' %}" alt="SANSARA" class="hero-advantages__bg">
+    <div class="hero-advantages__overlay"></div>
+
+    <div class="hero-advantages__content">
+      <div class="hero-advantages__label">SANSARA</div>
+      <h1 class="hero-advantages__title">Ритуальна атрибутика<br>з повагою та турботою</h1>
+      <p class="hero-advantages__text">
+        Усе необхідне для похоронної церемонії: труни, вінки, хрести, одяг та ритуальні товари
+        з можливістю швидкого оформлення замовлення.
+      </p>
+    </div>
+  </div>
+
+  <div class="hero-advantages__cards-wrap">
+    <div class="hero-advantages__cards">
+      <div class="hero-card">
+        <div class="hero-card__icon">✦</div>
+        <h3 class="hero-card__title">Якісна ритуальна атрибутика</h3>
+        <p class="hero-card__text">
+          У каталозі представлені труни, вінки, хрести, одяг і супутні ритуальні товари
+          для важливих моментів.
+        </p>
+      </div>
+
+      <div class="hero-card hero-card--raised">
+        <div class="hero-card__icon">✦</div>
+        <h3 class="hero-card__title">Швидке оформлення замовлення</h3>
+        <p class="hero-card__text">
+          Замовлення можна оформити прямо на сайті, після чого менеджер оперативно зв’яжеться
+          для уточнення деталей.
+        </p>
+      </div>
+
+      <div class="hero-card">
+        <div class="hero-card__icon">✦</div>
+        <h3 class="hero-card__title">Повага та підтримка</h3>
+        <p class="hero-card__text">
+          Ми розуміємо делікатність ситуації та намагаємося зробити процес замовлення
+          спокійним, зрозумілим і зручним.
+        </p>
+      </div>
+
+      <div class="hero-card">
+        <div class="hero-card__icon">✦</div>
+        <h3 class="hero-card__title">Зручний вибір товарів</h3>
+        <p class="hero-card__text">
+          Категорії, фото товарів і кошик допомагають швидко знайти потрібне
+          та оформити замовлення без зайвих дій.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="new-arrivals">
+  <div class="new-arrivals__inner">
+    <div class="new-arrivals__head">
+      <h2 class="new-arrivals__title">Новинки</h2>
+      <p class="new-arrivals__text">
+        Нові товари в каталозі SANSARA. Актуальні позиції з фото, цінами та інформацією про наявність.
+      </p>
+    </div>
+
+    <div class="new-arrivals__grid">
+      {% for product in new_products %}
+        <article class="new-arrivals__card">
+          <a class="new-arrivals__img-wrap" href="{% url 'shop:product_detail' product.id %}">
+            {% with img=product.images.first %}
+              {% if img %}
+                <img class="new-arrivals__img" src="{{ img.image.url }}" alt="{{ product.name }}">
+              {% else %}
+                <div class="new-arrivals__img new-arrivals__img--ph">Фото</div>
+              {% endif %}
+            {% endwith %}
+          </a>
+
+          <div class="new-arrivals__body">
+            <a class="new-arrivals__name" href="{% url 'shop:product_detail' product.id %}">
+              {{ product.name }}
+            </a>
+
+            <div class="new-arrivals__meta">
+              <div class="new-arrivals__price">{{ product.price }} грн</div>
+              <div class="new-arrivals__stock new-arrivals__stock--{{ product.stock_status }}">
+                {{ product.get_stock_status_display }}
+              </div>
+            </div>
+          </div>
+        </article>
+      {% empty %}
+        <div class="new-arrivals__empty">Новинок поки немає</div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section class="contact-showcase">
+  <div class="contact-showcase__inner">
+    <div class="contact-showcase__form-wrap">
+      <h2 class="contact-showcase__title">Ми тут, щоб допомогти</h2>
+
+      <form class="contact-showcase__form" method="post" action="{% url 'shop:reviews' %}">
+        {% csrf_token %}
+
+        <label class="contact-showcase__label">Ім’я</label>
+        <input class="contact-showcase__input" type="text" name="name" placeholder="Введіть ваше ім’я" required>
+
+        <label class="contact-showcase__label">Телефон</label>
+        <input class="contact-showcase__input" type="text" name="phone" placeholder="Введіть ваш номер телефону" required>
+
+        <label class="contact-showcase__label">Повідомлення</label>
+        <textarea class="contact-showcase__textarea" name="text" placeholder="Введіть ваше повідомлення" required></textarea>
+
+        <button class="contact-showcase__btn" type="submit">Надіслати</button>
+      </form>
+    </div>
+
+    <div class="contact-showcase__image-wrap">
+      <img src="{% static 'img/contact-block.jpg' %}" alt="SANSARA" class="contact-showcase__image">
+    </div>
+  </div>
+</section>
+
+{% endblock %}

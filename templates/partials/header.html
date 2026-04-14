@@ -1,0 +1,138 @@
+{% load static %}
+<header class="site-header">
+
+  <div class="desktop-header">
+    <div class="topbar">
+      <div class="container topbar__inner">
+        <div class="topbar__right">
+          <div class="phones">
+            <a class="phones__main" href="tel:+380982277727">Тел: +38 (098) 227-77-27</a>
+            <a class="phones__more" href="tel:+380500461401">+38 (050) 046-14-01</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mainbar">
+      <div class="container mainbar__inner">
+        <a href="{% url 'shop:home' %}" class="site-brand">
+          <img src="{% static 'img/logo.jfif' %}" alt="SANSARA" class="site-brand__logo">
+          <span class="site-brand__text">SANSARA</span>
+        </a>
+
+        <form class="search" method="get" action="{% url 'shop:product_list' %}">
+          <input
+            class="search__input"
+            type="search"
+            name="q"
+            placeholder="Пошук товару..."
+            value="{{ request.GET.q|default:'' }}"
+          />
+          <button class="search__btn" type="submit" aria-label="Пошук">Пошук</button>
+        </form>
+
+        <a class="cart-btn" href="{% url 'shop:cart_detail' %}" aria-label="Кошик">
+          <img class="cart-icon" src="{% static 'img/cart.png' %}" alt="Кошик">
+        </a>
+      </div>
+    </div>
+
+    <div class="navrow">
+      <div class="container navrow__inner">
+        <div class="catalog-strip__left">
+          {% for c in header_categories %}
+          {% if c.name != 'Інші товари' %}
+          <a class="catalog-strip__link" href="{% url 'shop:category_filter' c.slug %}">
+            {{ c.name }}
+          </a>
+          {% endif %}
+          {% endfor %}
+
+          {% for c in header_categories %}
+          {% if c.name == 'Інші товари' %}
+          <a class="catalog-strip__link" href="{% url 'shop:category_filter' c.slug %}">
+            {{ c.name }}
+          </a>
+          {% endif %}
+          {% endfor %}
+        </div>
+
+        <div class="catalog-strip__right">
+          <div class="navlinks__list">
+            <a class="navlinks__a" href="{% url 'shop:reviews' %}">Відгуки</a>
+            <a class="navlinks__a" href="{% url 'shop:about' %}">Про нас</a>
+            <a class="navlinks__a" href="{% url 'shop:delivery' %}">Доставка</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mobile-header">
+    <div class="mobile-topbar">
+      <a class="mobile-phone" href="tel:+380982277727">Тел: +38 (098) 227-77-27</a>
+    </div>
+
+    <div class="mobile-mainbar">
+      <div class="container mobile-mainbar__inner">
+        <button class="mobile-menu-btn" type="button" id="mobileMenuBtn" aria-label="Меню">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <a href="{% url 'shop:home' %}" class="mobile-brand">SANSARA</a>
+
+        <a class="cart-btn mobile-cart-btn" href="{% url 'shop:cart_detail' %}" aria-label="Кошик">
+          <img class="cart-icon" src="{% static 'img/cart.png' %}" alt="Кошик">
+        </a>
+
+        <form class="search mobile-search" method="get" action="{% url 'shop:product_list' %}">
+          <input
+            class="search__input"
+            type="search"
+            name="q"
+            placeholder="Пошук товару..."
+            value="{{ request.GET.q|default:'' }}"
+          />
+          <button class="search__btn" type="submit" aria-label="Пошук">Пошук</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="mobile-menu-panel" id="mobileMenu">
+      <div class="mobile-menu-panel__section">
+        <div class="mobile-menu-panel__title">Категорії</div>
+
+        <a class="mobile-menu-panel__link" href="{% url 'shop:product_list' %}">Усі товари</a>
+
+        {% for c in header_categories %}
+          <a class="mobile-menu-panel__link {% if request.resolver_match.kwargs.category_slug == c.slug %}is-active{% endif %}"
+             href="{% url 'shop:category_filter' c.slug %}">
+            {{ c.name }}
+          </a>
+        {% endfor %}
+      </div>
+
+      <div class="mobile-menu-panel__section">
+        <a class="mobile-menu-panel__link" href="{% url 'shop:reviews' %}">Відгуки</a>
+        <a class="mobile-menu-panel__link" href="{% url 'shop:about' %}">Про нас</a>
+        <a class="mobile-menu-panel__link" href="{% url 'shop:delivery' %}">Доставка</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const btn = document.getElementById("mobileMenuBtn");
+      const menu = document.getElementById("mobileMenu");
+
+      if (btn && menu) {
+        btn.addEventListener("click", function () {
+          menu.classList.toggle("is-open");
+        });
+      }
+    });
+  </script>
+
+</header>

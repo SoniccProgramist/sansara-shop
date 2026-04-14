@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Відгуки{% endblock %}
+
+{% block content %}
+
+<section class="reviews-wrap">
+  <div class="reviews-card">
+    <h1 class="reviews-title">Відгуки</h1>
+
+    <form method="post" class="reviews-form">
+      {% csrf_token %}
+
+      <div class="reviews-grid">
+        <div class="field">
+          <label class="field__label">Ваше ім’я</label>
+          <input class="field__input" type="text" name="name" placeholder="Наприклад: Олена" required>
+        </div>
+
+        <div class="field">
+          <label class="field__label">Телефон</label>
+          <input class="field__input" type="tel" name="phone" placeholder="+38 (0__) ___-__-__" required>
+        </div>
+
+        <div class="field field--full">
+          <label class="field__label">Ваш відгук</label>
+          <textarea class="field__input field__textarea" name="text" placeholder="Напишіть кілька слів…" required></textarea>
+        </div>
+      </div>
+
+      <div class="reviews-actions">
+        <button class="btn btn-primary btn-lg" type="submit">Надіслати</button>
+        <div class="reviews-note">Після відправки відгук з’явиться після перевірки адміністратором.</div>
+      </div>
+    </form>
+  </div>
+
+  {% if reviews %}
+    <div class="reviews-list">
+      {% for r in reviews %}
+        <div class="review-item">
+          <div class="review-head">
+            <strong class="review-name">{{ r.name }}</strong>
+            <span class="review-date">{{ r.created_at|date:"d.m.Y" }}</span>
+          </div>
+          <p class="review-text">{{ r.text }}</p>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+</section>
+
+{% endblock %}
