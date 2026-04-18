@@ -9,6 +9,86 @@
 
 {% block content %}
 
+<style>
+.catalog-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 34px 0 6px;
+    padding-top: 8px;
+}
+
+.catalog-pagination__pages {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.catalog-pagination__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    height: 44px;
+    padding: 0 14px;
+    border: 1px solid #111;
+    background: #fff;
+    color: #111;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+}
+
+.catalog-pagination__btn:hover {
+    background: #111;
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.catalog-pagination__btn.is-active {
+    background: #111;
+    color: #fff;
+    border-color: #111;
+    pointer-events: none;
+}
+
+.catalog-pagination__btn--nav {
+    min-width: 96px;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+}
+
+@media (max-width: 640px) {
+    .catalog-pagination {
+        gap: 8px;
+        margin-top: 28px;
+    }
+
+    .catalog-pagination__pages {
+        gap: 6px;
+    }
+
+    .catalog-pagination__btn {
+        min-width: 40px;
+        height: 40px;
+        padding: 0 12px;
+        font-size: 13px;
+    }
+
+    .catalog-pagination__btn--nav {
+        min-width: 84px;
+    }
+}
+</style>
+
 <section class="catalog-page">
   <div class="catalog-page__wrap">
 
@@ -40,7 +120,7 @@
       </h1>
 
       <div class="catalog-cards">
-        {% for product in products %}
+        {% for product in page_obj %}
           <article class="catalog-card">
             <a class="catalog-card__img-wrap" href="{% url 'shop:product_detail' product.id %}">
               {% with img=product.images.first %}
@@ -69,6 +149,37 @@
           <p class="catalog-page__empty">Товари не знайдено.</p>
         {% endfor %}
       </div>
+
+      {% if page_obj.paginator.num_pages > 1 %}
+      <div class="catalog-pagination">
+        {% if page_obj.has_previous %}
+        <a class="catalog-pagination__btn catalog-pagination__btn--nav"
+           href="?{% if q %}q={{ q }}&{% endif %}page={{ page_obj.previous_page_number }}">
+          Назад
+        </a>
+        {% endif %}
+
+        <div class="catalog-pagination__pages">
+          {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+          <span class="catalog-pagination__btn is-active">{{ num }}</span>
+          {% else %}
+          <a class="catalog-pagination__btn"
+             href="?{% if q %}q={{ q }}&{% endif %}page={{ num }}">
+            {{ num }}
+          </a>
+          {% endif %}
+          {% endfor %}
+        </div>
+
+        {% if page_obj.has_next %}
+        <a class="catalog-pagination__btn catalog-pagination__btn--nav"
+           href="?{% if q %}q={{ q }}&{% endif %}page={{ page_obj.next_page_number }}">
+          Далі
+        </a>
+        {% endif %}
+      </div>
+      {% endif %}
     </div>
 
   </div>

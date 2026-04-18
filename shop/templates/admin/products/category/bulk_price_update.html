@@ -1,0 +1,21 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div style="max-width: 720px;">
+    <h1>{{ title }}</h1>
+
+    <form method="post" style="margin-top: 20px;">
+        {% csrf_token %}
+        <fieldset class="module aligned">
+            {{ form.as_p }}
+        </fieldset>
+
+        <div style="margin-top: 20px;">
+            <button type="submit" class="default">Застосувати</button>
+            <a href="{% url 'admin:products_category_changelist' %}" style="margin-left: 12px;">
+                Скасувати
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,6 +1,6 @@
 from django.db import transaction
 from django.shortcuts import render, redirect, get_object_or_404
-
+from django.core.paginator import Paginator
 from products.models import Product, Category, Review, ProductVariant
 from .models import Order, OrderItem
 from .utils import send_telegram_message
@@ -59,10 +59,18 @@ def product_list(request, category_slug=None):
     if q:
         products = products.filter(name__icontains=q)
 
+    products = products.order_by("-id")
+
+    paginator = Paginator(products, 12)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
     context = {
         "categories": categories,
-        "products": products,
+        "products": page_obj,
+        "page_obj": page_obj,
         "current_category": current_category,
+        "q": q,
     }
     return render(request, "shop/product_list.html", context)
 

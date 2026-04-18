@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>500 | SANSARA</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, sans-serif;
+            background:
+                linear-gradient(rgba(255,255,255,0.88), rgba(255,255,255,0.88)),
+                url("/static/img/bg.webp") center/cover no-repeat fixed;
+            color: #111;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .error-box {
+            width: 100%;
+            max-width: 720px;
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid #111;
+            padding: 40px 32px;
+            text-align: center;
+            backdrop-filter: blur(8px);
+        }
+
+        .error-code {
+            margin: 0 0 12px;
+            font-size: 72px;
+            line-height: 1;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+        }
+
+        .error-title {
+            margin: 0 0 14px;
+            font-size: 24px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .error-text {
+            margin: 0 auto 28px;
+            max-width: 520px;
+            font-size: 16px;
+            line-height: 1.7;
+            color: #333;
+        }
+
+        .error-actions {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .error-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 190px;
+            height: 48px;
+            padding: 0 18px;
+            border: 1px solid #111;
+            background: #111;
+            color: #fff;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            transition: 0.18s ease;
+        }
+
+        .error-btn:hover {
+            background: #fff;
+            color: #111;
+        }
+
+        .error-btn--ghost {
+            background: #fff;
+            color: #111;
+        }
+
+        .error-btn--ghost:hover {
+            background: #111;
+            color: #fff;
+        }
+
+        @media (max-width: 640px) {
+            .error-box {
+                padding: 30px 20px;
+            }
+
+            .error-code {
+                font-size: 56px;
+            }
+
+            .error-title {
+                font-size: 20px;
+            }
+
+            .error-text {
+                font-size: 15px;
+            }
+
+            .error-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="error-box">
+        <p class="error-code">500</p>
+        <h1 class="error-title">Помилка сервера</h1>
+        <p class="error-text">
+            На сервері сталася помилка. Спробуйте оновити сторінку трохи пізніше.
+        </p>
+
+        <div class="error-actions">
+            <a href="/" class="error-btn">На головну</a>
+            <a href="javascript:history.back()" class="error-btn error-btn--ghost">Назад</a>
+        </div>
+    </div>
+</body>
+</html>

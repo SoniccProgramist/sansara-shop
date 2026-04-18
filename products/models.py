@@ -13,6 +13,7 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+
 class Product(models.Model):
     STOCK_CHOICES = [
         ("in_stock", "В наявності"),
@@ -20,68 +21,11 @@ class Product(models.Model):
         ("out_of_stock", "Немає в наявності"),
     ]
 
-    category = models.ForeignKey('Category', on_delete=models.CASCADE, related_name='products')
-    name = models.CharField(max_length=200)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    description = models.TextField(blank=True)
-    is_new = models.BooleanField(default=False, verbose_name="Новинка")
-    stock_status = models.CharField(
-        max_length=20,
-        choices=STOCK_CHOICES,
-        default="in_stock",
-        verbose_name="Наявність"
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.CASCADE,
+        related_name='products'
     )
-
-    def __str__(self):
-        return self.name
-
-class ProductImage(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='products/')
-    is_main = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f"Image for {self.product_id}"
-
-
-class Review(models.Model):
-    name = models.CharField("Ім’я", max_length=80)
-    phone = models.CharField("Телефон", max_length=30)
-    text = models.TextField("Відгук", max_length=2000)
-
-    is_approved = models.BooleanField("Показувати на сайті", default=False)
-    created_at = models.DateTimeField("Створено", auto_now_add=True)
-
-    class Meta:
-        verbose_name = "Відгук"
-        verbose_name_plural = "Відгуки"
-        ordering = ["-created_at"]
-
-    def __str__(self):
-        return f"{self.name} ({self.phone})"
-
-
-class Category(models.Model):
-    name = models.CharField(max_length=100, verbose_name='Название')
-    slug = models.SlugField(max_length=120, unique=True, verbose_name='URL')
-    is_active = models.BooleanField(default=True, verbose_name='Активна')
-
-    class Meta:
-        verbose_name = 'Категория'
-        verbose_name_plural = 'Категории'
-
-    def __str__(self):
-        return self.name
-
-
-class Product(models.Model):
-    STOCK_CHOICES = [
-        ("in_stock", "В наявності"),
-        ("on_order", "Під замовлення"),
-        ("out_of_stock", "Немає в наявності"),
-    ]
-
-    category = models.ForeignKey('Category', on_delete=models.CASCADE, related_name='products')
     name = models.CharField(max_length=200)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField(blank=True)
