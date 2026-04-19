@@ -13,6 +13,7 @@ class Order(models.Model):
 
     phone = models.CharField(max_length=32, verbose_name="Телефон")
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Сума")
+    comment = models.TextField(blank=True, verbose_name="Коментар до замовлення")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="new", verbose_name="Статус")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Створено")
 
@@ -25,6 +26,7 @@ class OrderItem(models.Model):
     product = models.ForeignKey("products.Product", on_delete=models.PROTECT, null=True, blank=True, verbose_name="Товар")
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Ціна")
     quantity = models.PositiveIntegerField(default=1, verbose_name="К-сть")
+    comment = models.TextField(blank=True, verbose_name="Коментар до товару")
 
     def __str__(self):
         return f"{self.product} x{self.quantity}"

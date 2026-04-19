@@ -147,7 +147,22 @@ def add_to_cart(request, product_id):
     if variant_id:
         cart_key = f"{product_id}:{variant_id}"
 
-    cart[cart_key] = cart.get(cart_key, 0) + 1
+    existing_item = cart.get(cart_key)
+
+    if isinstance(existing_item, dict):
+        existing_item["quantity"] = existing_item.get("quantity", 0) + 1
+        existing_item.setdefault("comment", "")
+        cart[cart_key] = existing_item
+    elif isinstance(existing_item, int):
+        cart[cart_key] = {
+            "quantity": existing_item + 1,
+            "comment": "",
+        }
+    else:
+        cart[cart_key] = {
+            "quantity": 1,
+            "comment": "",
+        }
 
     request.session["cart"] = cart
     request.session.modified = True
@@ -179,7 +194,14 @@ def cart_detail(request):
     cart_items = []
     total_price = 0
 
-    for key, quantity in cart.items():
+    for key, item_data in cart.items():
+        if isinstance(item_data, dict):
+            quantity = item_data.get("quantity", 0)
+            comment = item_data.get("comment", "")
+        else:
+            quantity = item_data
+            comment = ""
+
         if quantity <= 0:
             continue
 
@@ -221,6 +243,7 @@ def cart_detail(request):
             "quantity": quantity,
             "item_total": item_total,
             "image_url": image_url,
+            "comment": comment,
         })
 
     error = None
@@ -229,6 +252,7 @@ def cart_detail(request):
         phone = (request.POST.get("phone") or "").strip()
         full_name = (request.POST.get("full_name") or "").strip()
         city = (request.POST.get("city") or "").strip()
+        comment = (request.POST.get("comment") or "").strip()
 
         if not cart_items:
             error = "Кошик порожній."
@@ -241,6 +265,7 @@ def cart_detail(request):
                     total_price=total_price,
                     full_name=full_name,
                     city=city,
+                    comment=comment,
                 )
 
                 for item in cart_items:
@@ -249,6 +274,7 @@ def cart_detail(request):
                         product=item["product"],
                         price=item["price"],
                         quantity=item["quantity"],
+                        comment=item["comment"],
                     )
 
             items_text = "\n".join(
@@ -256,6 +282,7 @@ def cart_detail(request):
                     f"• {item['product'].name}"
                     f"{' (' + item['variant_name'] + ')' if item['variant_name'] else ''}"
                     f" × {item['quantity']} = {item['item_total']} грн"
+                    f"{' | Коментар: ' + item['comment'] if item['comment'] else ''}"
                     for item in cart_items
                 ]
             )
@@ -265,6 +292,7 @@ def cart_detail(request):
                 f"👤 {full_name}\n"
                 f"🏙️ {city}\n"
                 f"📞 {phone}\n\n"
+                f"{'📝 Коментар: ' + comment + chr(10) if comment else ''}\n"
                 f"Товари:\n{items_text}\n\n"
                 f"💰 Сума: {total_price} грн"
             )
@@ -296,12 +324,17 @@ def update_cart(request, product_id):
     except (TypeError, ValueError):
         quantity = 1
 
+    comment = (request.POST.get("comment") or "").strip()
+
     cart_key = str(product_id)
     if variant_id:
         cart_key = f"{product_id}:{variant_id}"
 
     if quantity > 0:
-        cart[cart_key] = quantity
+        cart[cart_key] = {
+            "quantity": quantity,
+            "comment": comment,
+        }
     else:
         cart.pop(cart_key, None)
 
@@ -338,6 +371,7 @@ def reviews(request):
         name = (request.POST.get("name") or "").strip()
         phone = (request.POST.get("phone") or "").strip()
         text = (request.POST.get("text") or "").strip()
+
 
         if not name or not phone or not text:
             error = "Будь ласка, заповніть усі поля."
