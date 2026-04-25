@@ -15,6 +15,13 @@ from .models import (
 )
 from .forms import CategoryPriceUpdateForm
 
+def round_price_to_5(value: Decimal) -> Decimal:
+    if value <= 0:
+        return Decimal("0")
+
+    rounded = (value / Decimal("5")).quantize(Decimal("1"), rounding=ROUND_HALF_UP) * Decimal("5")
+    return rounded.quantize(Decimal("1"))
+
 
 class ProductImageInline(admin.TabularInline):
     model = ProductImage
@@ -34,8 +41,8 @@ class ProductVariantImageInline(admin.TabularInline):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "slug", "is_active")
-    list_filter = ("is_active",)
+    list_display = ("id", "name", "parent", "slug", "is_active")
+    list_filter = ("is_active", "parent")
     search_fields = ("name",)
     prepopulated_fields = {"slug": ("name",)}
 
@@ -60,13 +67,25 @@ class CategoryAdmin(admin.ModelAdmin):
         if request.method == "POST" and form.is_valid():
             category = form.cleaned_data["category"]
             percent = form.cleaned_data["percent"]
+            fixed_amount = form.cleaned_data.get("fixed_amount")
             update_products = form.cleaned_data["update_products"]
             update_variants = form.cleaned_data["update_variants"]
 
-            multiplier = Decimal("1") + (percent / Decimal("100"))
-
             updated_products_count = 0
             updated_variants_count = 0
+
+            def calculate_new_price(old_price: Decimal) -> Decimal:
+                if percent not in (None, Decimal("0")):
+                    raw_price = old_price * (Decimal("1") + (percent / Decimal("100")))
+                else:
+                    raw_price = old_price + fixed_amount
+
+                new_price = round_price_to_5(raw_price)
+
+                if new_price < 0:
+                    new_price = Decimal("0")
+
+                return new_price
 
             with transaction.atomic():
                 if update_products:
@@ -75,12 +94,9 @@ class CategoryAdmin(admin.ModelAdmin):
                     for product in products:
                         has_variants = product.variants.exists()
                         if not has_variants and product.price is not None:
-                            new_price = (product.price * multiplier).quantize(
-                                Decimal("0.01"),
-                                rounding=ROUND_HALF_UP
-                            )
+                            new_price = calculate_new_price(product.price)
                             if new_price < 0:
-                                new_price = Decimal("0.00")
+                                new_price = Decimal("0")
 
                             product.price = new_price
                             product.save(update_fields=["price"])
@@ -91,12 +107,9 @@ class CategoryAdmin(admin.ModelAdmin):
 
                     for variant in variants:
                         if variant.price is not None:
-                            new_price = (variant.price * multiplier).quantize(
-                                Decimal("0.01"),
-                                rounding=ROUND_HALF_UP
-                            )
+                            new_price = calculate_new_price(variant.price)
                             if new_price < 0:
-                                new_price = Decimal("0.00")
+                                new_price = Decimal("0")
 
                             variant.price = new_price
                             variant.save(update_fields=["price"])

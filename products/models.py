@@ -5,13 +5,28 @@ class Category(models.Model):
     name = models.CharField(max_length=100, verbose_name='Название')
     slug = models.SlugField(max_length=120, unique=True, verbose_name='URL')
     is_active = models.BooleanField(default=True, verbose_name='Активна')
-
+    parent = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='children',
+        verbose_name='Батьківська категорія'
+    )
     class Meta:
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
 
     def __str__(self):
+        if self.parent:
+            return f"{self.parent.name} → {self.name}"
         return self.name
+
+    def get_descendants_ids(self):
+        ids = [self.id]
+        for child in self.children.filter(is_active=True):
+            ids.extend(child.get_descendants_ids())
+        return ids
 
 
 class Product(models.Model):

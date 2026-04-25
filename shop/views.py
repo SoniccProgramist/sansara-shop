@@ -36,7 +36,7 @@ def home(request):
 
 
 def product_list(request, category_slug=None):
-    categories = Category.objects.filter(is_active=True)
+    categories = Category.objects.filter(is_active=True).prefetch_related("children", "children__children")
     products = Product.objects.filter(
         category__is_active=True
     ).prefetch_related(
@@ -53,7 +53,9 @@ def product_list(request, category_slug=None):
             slug=category_slug,
             is_active=True
         )
-        products = products.filter(category=current_category)
+
+        category_ids = current_category.get_descendants_ids()
+        products = products.filter(category_id__in=category_ids)
 
     q = (request.GET.get("q") or "").strip()
     if q:

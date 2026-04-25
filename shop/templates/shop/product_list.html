@@ -9,85 +9,7 @@
 
 {% block content %}
 
-<style>
-.catalog-pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin: 34px 0 6px;
-    padding-top: 8px;
-}
 
-.catalog-pagination__pages {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.catalog-pagination__btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 44px;
-    height: 44px;
-    padding: 0 14px;
-    border: 1px solid #111;
-    background: #fff;
-    color: #111;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 700;
-    line-height: 1;
-    letter-spacing: 0.02em;
-    transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
-}
-
-.catalog-pagination__btn:hover {
-    background: #111;
-    color: #fff;
-    transform: translateY(-1px);
-}
-
-.catalog-pagination__btn.is-active {
-    background: #111;
-    color: #fff;
-    border-color: #111;
-    pointer-events: none;
-}
-
-.catalog-pagination__btn--nav {
-    min-width: 96px;
-    text-transform: uppercase;
-    font-size: 12px;
-    letter-spacing: 0.08em;
-}
-
-@media (max-width: 640px) {
-    .catalog-pagination {
-        gap: 8px;
-        margin-top: 28px;
-    }
-
-    .catalog-pagination__pages {
-        gap: 6px;
-    }
-
-    .catalog-pagination__btn {
-        min-width: 40px;
-        height: 40px;
-        padding: 0 12px;
-        font-size: 13px;
-    }
-
-    .catalog-pagination__btn--nav {
-        min-width: 84px;
-    }
-}
-</style>
 
 <section class="catalog-page">
   <div class="catalog-page__wrap">
@@ -102,10 +24,32 @@
         </a>
 
         {% for category in categories %}
+        {% if not category.parent %}
+        <div class="catalog-sidebar__group">
           <a href="{% url 'shop:category_filter' category.slug %}"
              class="catalog-sidebar__link {% if current_category and current_category.id == category.id %}is-active{% endif %}">
             {{ category.name }}
           </a>
+
+          {% for child in category.children.all %}
+          {% if child.is_active %}
+          <a href="{% url 'shop:category_filter' child.slug %}"
+             class="catalog-sidebar__sublink {% if current_category and current_category.id == child.id %}is-active{% endif %}">
+            {{ child.name }}
+          </a>
+
+          {% for grandchild in child.children.all %}
+          {% if grandchild.is_active %}
+          <a href="{% url 'shop:category_filter' grandchild.slug %}"
+             class="catalog-sidebar__subsublink {% if current_category and current_category.id == grandchild.id %}is-active{% endif %}">
+            {{ grandchild.name }}
+          </a>
+          {% endif %}
+          {% endfor %}
+          {% endif %}
+          {% endfor %}
+        </div>
+        {% endif %}
         {% endfor %}
       </nav>
     </aside>
