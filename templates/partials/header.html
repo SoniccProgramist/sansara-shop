@@ -107,10 +107,30 @@
         <a class="mobile-menu-panel__link" href="{% url 'shop:product_list' %}">Усі товари</a>
 
         {% for c in header_categories %}
+        <div class="mobile-menu-panel__group">
           <a class="mobile-menu-panel__link {% if request.resolver_match.kwargs.category_slug == c.slug %}is-active{% endif %}"
              href="{% url 'shop:category_filter' c.slug %}">
             {{ c.name }}
           </a>
+
+          {% for child in c.children.all %}
+          {% if child.is_active %}
+          <a class="mobile-menu-panel__sublink {% if request.resolver_match.kwargs.category_slug == child.slug %}is-active{% endif %}"
+             href="{% url 'shop:category_filter' child.slug %}">
+            {{ child.name }}
+          </a>
+
+          {% for grandchild in child.children.all %}
+          {% if grandchild.is_active %}
+          <a class="mobile-menu-panel__subsublink {% if request.resolver_match.kwargs.category_slug == grandchild.slug %}is-active{% endif %}"
+             href="{% url 'shop:category_filter' grandchild.slug %}">
+            {{ grandchild.name }}
+          </a>
+          {% endif %}
+          {% endfor %}
+          {% endif %}
+          {% endfor %}
+        </div>
         {% endfor %}
       </div>
 

@@ -1,9 +1,14 @@
 from products.models import Category, Product
 
+
 def header_categories(request):
     return {
-        "header_categories": Category.objects.filter(is_active=True, parent__isnull=True).order_by("name")
+        "header_categories": Category.objects.filter(
+            is_active=True,
+            parent__isnull=True
+        ).prefetch_related("children", "children__children").order_by("name")
     }
+
 
 def header_new_products(request):
     return {
