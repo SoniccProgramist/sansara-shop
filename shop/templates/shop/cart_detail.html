@@ -71,6 +71,11 @@
       {% if error %}
         <div class="cart-error">{{ error }}</div>
       {% endif %}
+        <div class="cart-continue">
+            <a class="cart-continue__btn" href="{% url 'shop:product_list' %}">
+                Продовжити покупки
+            </a>
+        </div>
 
       <div class="checkout-box">
         <div class="checkout-box__title">Оформлення замовлення</div>

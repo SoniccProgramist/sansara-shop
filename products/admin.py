@@ -15,11 +15,15 @@ from .models import (
 )
 from .forms import CategoryPriceUpdateForm
 
+
 def round_price_to_5(value: Decimal) -> Decimal:
     if value <= 0:
         return Decimal("0")
 
-    rounded = (value / Decimal("5")).quantize(Decimal("1"), rounding=ROUND_HALF_UP) * Decimal("5")
+    rounded = (
+        (value / Decimal("5")).quantize(Decimal("1"), rounding=ROUND_HALF_UP)
+        * Decimal("5")
+    )
     return rounded.quantize(Decimal("1"))
 
 
@@ -71,6 +75,9 @@ class CategoryAdmin(admin.ModelAdmin):
             update_products = form.cleaned_data["update_products"]
             update_variants = form.cleaned_data["update_variants"]
 
+            # Берем выбранную категорию + все её подкатегории и подподкатегории
+            category_ids = category.get_descendants_ids()
+
             updated_products_count = 0
             updated_variants_count = 0
 
@@ -89,28 +96,24 @@ class CategoryAdmin(admin.ModelAdmin):
 
             with transaction.atomic():
                 if update_products:
-                    products = Product.objects.filter(category=category)
+                    products = Product.objects.filter(category_id__in=category_ids)
 
                     for product in products:
                         has_variants = product.variants.exists()
                         if not has_variants and product.price is not None:
                             new_price = calculate_new_price(product.price)
-                            if new_price < 0:
-                                new_price = Decimal("0")
-
                             product.price = new_price
                             product.save(update_fields=["price"])
                             updated_products_count += 1
 
                 if update_variants:
-                    variants = ProductVariant.objects.filter(product__category=category)
+                    variants = ProductVariant.objects.filter(
+                        product__category_id__in=category_ids
+                    )
 
                     for variant in variants:
                         if variant.price is not None:
                             new_price = calculate_new_price(variant.price)
-                            if new_price < 0:
-                                new_price = Decimal("0")
-
                             variant.price = new_price
                             variant.save(update_fields=["price"])
                             updated_variants_count += 1
